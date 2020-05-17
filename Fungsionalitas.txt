@@ -1,0 +1,20 @@
+Fungsi fungsi nya teh ini kang
+1. Menampilkan keadaan terkini tiap ruangan
+Ruangan 1
+-Suhu
+-Api
+Ruangan 2
+-Suhu
+-Api
+-Gas
+Ruangan 3
+-Suhu
+-Api
+
+2. Aktuator 
+- Pompa air aktif/tidak
+- Kipas pembuangan aktif/tidak
+- Pintu darurat depan
+- Pintu darurat belakang
+
+3. Denah posisi kebakaran
