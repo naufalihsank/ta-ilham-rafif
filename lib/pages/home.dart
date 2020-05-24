@@ -10,6 +10,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool pompaAir = false;
+  bool kipasPembuangan = false;
+  bool daruratDepan = false;
+  bool daruratBelakang = false;
+
   Widget _buildRoomCard(
       String title, String temperature, String fire, Color mainColor) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -91,12 +96,14 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildActuator() {
     final deviceWidth = MediaQuery.of(context).size.width;
+
     return Container(
       margin: EdgeInsets.only(
         left: deviceWidth * 0.025,
         right: deviceWidth * 0.025,
         top: deviceWidth * 0.025,
       ),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: BoxDecoration(
         color: Color(0xffd35656),
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -107,7 +114,194 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      height: 100,
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Actuator',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+          ),
+          Divider(
+            color: Colors.white,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                'Pompa Air',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              Switch(
+                value: pompaAir,
+                onChanged: (bool value) {
+                  setState(() {
+                    pompaAir = value;
+                  });
+                },
+              )
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                'Kipas Pembuangan',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              Switch(
+                value: kipasPembuangan,
+                onChanged: (bool value) {
+                  setState(() {
+                    kipasPembuangan = value;
+                  });
+                },
+              )
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                'Pintu Darurat Depan',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              Switch(
+                value: daruratDepan,
+                onChanged: (bool value) {
+                  setState(() {
+                    daruratDepan = value;
+                  });
+                },
+              )
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                'Pintu Darurat Belakang',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              Switch(
+                value: daruratBelakang,
+                onChanged: (bool value) {
+                  setState(() {
+                    daruratBelakang = value;
+                  });
+                },
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRoomMap() {
+    final deviceWidth = MediaQuery.of(context).size.width;
+
+    return Container(
+      margin: EdgeInsets.only(
+        left: deviceWidth * 0.025,
+        right: deviceWidth * 0.025,
+        top: deviceWidth * 0.025,
+      ),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Color(0xff616f39),
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(2.0, 2.0),
+            blurRadius: 5.0,
+          )
+        ],
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Denah',
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          Divider(
+            color: Colors.white,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                width: deviceWidth * 0.4,
+                height: deviceWidth * 0.4,
+                child: Center(
+                  child: Text(
+                    '1',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 28
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Color(0xffd35656),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                width: deviceWidth * 0.4,
+                height: deviceWidth * 0.4,
+                child: Center(
+                  child: Text(
+                    '2',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                width: deviceWidth * 0.4,
+                height: deviceWidth * 0.4,
+                child: Center(
+                  child: Text(
+                    '3',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 28
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Color(0xff616f39),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                width: deviceWidth * 0.4,
+                height: deviceWidth * 0.4,
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 
@@ -122,7 +316,11 @@ class _HomePageState extends State<HomePage> {
         _buildRoomCard('Ruangan 1', '37', '2', Color(0xfff67280)),
         _buildRoomCard('Ruangan 2', '27', '0', Color(0xffc06c84)),
         _buildRoomCard('Ruangan 3', '35', '3', Color(0xff6c567b)),
-        _buildActuator()
+        _buildActuator(),
+        _buildRoomMap(),
+        SizedBox(
+          height: deviceHeight * 0.05,
+        )
       ],
     );
   }
