@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "548257860191",
+    "firebase_url": "https://tarafifm.firebaseio.com",
+    "project_id": "tarafifm",
+    "storage_bucket": "tarafifm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548257860191:android:31136769f1a481e15969ea",
+        "android_client_info": {
+          "package_name": "com.example.ta_ilham_rafif"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "548257860191-d9b0nnm0q7rf0pd7ofc3il92o2e9sf1b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8uoliSMQXa_EAO65GHk11F2bC3A7OGPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548257860191-d9b0nnm0q7rf0pd7ofc3il92o2e9sf1b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ta_ilham_rafif/model/dataResource.dart';
 import 'package:ta_ilham_rafif/widgets/side_drawer.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,6 +17,39 @@ class _HomePageState extends State<HomePage> {
   bool kipasPembuangan = false;
   bool daruratDepan = false;
   bool daruratBelakang = false;
+  dynamic coba;
+
+  FirebaseApp app;
+  DatabaseReference itemRefRuang1;
+
+  @override
+  void initState() {
+    super.initState();
+    getFirebase();
+  }
+
+  void getFirebase() async {
+    app = await FirebaseApp.configure(
+      name: "ta_ilham_rafif",
+      options: FirebaseOptions(
+        googleAppID: "1:548257860191:android:31136769f1a481e15969ea",
+        apiKey: "AIzaSyCZgyvNjSGZtoREEsv8zFeB8VtoqVuoLas",
+        databaseURL: "https://tarafifm.firebaseio.com",
+      ),
+    );
+    final FirebaseDatabase database = FirebaseDatabase(app: app);
+    itemRefRuang1 = database.reference().child('Test');
+    itemRefRuang1.onChildAdded.listen(_onEntryChanged);
+    itemRefRuang1.onChildChanged.listen(_onEntryChanged);
+    // itemRefGate2.onChildChanged.listen(_onEntryChangedKontrolTab);
+  }
+
+  _onEntryChanged(Event event) {
+    setState(() {
+      coba = DataResource.fromSnapShot(event.snapshot).value;
+      print(coba);
+    });
+  }
 
   Widget _buildRoomCard(
       String title, String temperature, String fire, Color mainColor) {

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class Room extends Equatable {
   final double temperature;
