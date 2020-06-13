@@ -17,10 +17,24 @@ class _HomePageState extends State<HomePage> {
   bool kipasPembuangan = false;
   bool daruratDepan = false;
   bool daruratBelakang = false;
-  dynamic coba;
+  dynamic apiRuang1;
+  dynamic suhuRuang1;
+  dynamic apiRuang2;
+  dynamic suhuRuang2;
+  dynamic gasRuang2;
+  dynamic apiRuang3;
+  dynamic suhuRuang3;
 
   FirebaseApp app;
-  DatabaseReference itemRefRuang1;
+  DatabaseReference itemRefApiRuang1;
+  DatabaseReference itemRefSuhuRuang1;
+  DatabaseReference itemRefApiRuang2;
+  DatabaseReference itemRefSuhuRuang2;
+  DatabaseReference itemRefGasRuang2;
+  DatabaseReference itemRefApiRuang3;
+  DatabaseReference itemRefSuhuRuang3;
+  DatabaseReference itemRefPintuDaruratDepan;
+  DatabaseReference itemRefPintuDaruratBelakang;
 
   @override
   void initState() {
@@ -38,16 +52,62 @@ class _HomePageState extends State<HomePage> {
       ),
     );
     final FirebaseDatabase database = FirebaseDatabase(app: app);
-    itemRefRuang1 = database.reference().child('Test');
-    itemRefRuang1.onChildAdded.listen(_onEntryChanged);
-    itemRefRuang1.onChildChanged.listen(_onEntryChanged);
-    // itemRefGate2.onChildChanged.listen(_onEntryChangedKontrolTab);
+    itemRefApiRuang1 = database.reference().child('Ruangan1/Api');
+    itemRefApiRuang1.onChildAdded.listen(_onEntryChangedApiRuang1);
+    itemRefApiRuang1.onChildChanged.listen(_onEntryChangedApiRuang1);
+    itemRefSuhuRuang1 = database.reference().child('Ruangan1/Suhu');
+    itemRefSuhuRuang1.onChildAdded.listen(_onEntryChangedSuhuRuang1);
+    itemRefSuhuRuang1.onChildChanged.listen(_onEntryChangedSuhuRuang1);
+    itemRefApiRuang2 = database.reference().child('Ruangan2/Api');
+    itemRefApiRuang2.onChildAdded.listen(_onEntryChangedApiRuang2);
+    itemRefApiRuang2.onChildChanged.listen(_onEntryChangedSuhuRuang1);
+    itemRefSuhuRuang2 = database.reference().child('Ruangan2/Suhu');
+    itemRefSuhuRuang2.onChildAdded.listen(_onEntryChangedSuhuRuang2);
+    itemRefSuhuRuang2.onChildChanged.listen(_onEntryChangedSuhuRuang2);
+    itemRefGasRuang2 = database.reference().child('Ruangan2/Gas');
+    itemRefGasRuang2.onChildAdded.listen(_onEntryChangedGasRuang2);
+    itemRefGasRuang2.onChildChanged.listen(_onEntryChangedGasRuang2);
+    itemRefApiRuang3 = database.reference().child('Ruangan3/Api');
+    itemRefApiRuang3.onChildAdded.listen(_onEntryChangedApiRuang3);
+    itemRefApiRuang3.onChildChanged.listen(_onEntryChangedApiRuang3);
+    itemRefSuhuRuang3 = database.reference().child('Ruangan3/Suhu');
+    itemRefSuhuRuang3.onChildAdded.listen(_onEntryChangedSuhuRuang3);
+    itemRefSuhuRuang3.onChildChanged.listen(_onEntryChangedSuhuRuang3);
   }
 
-  _onEntryChanged(Event event) {
+  _onEntryChangedApiRuang1(Event event) {
     setState(() {
-      coba = DataResource.fromSnapShot(event.snapshot).value;
-      print(coba);
+      apiRuang1 = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+  _onEntryChangedSuhuRuang1(Event event) {
+    setState(() {
+      suhuRuang1 = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+  _onEntryChangedApiRuang2(Event event) {
+    setState(() {
+      apiRuang2 = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+  _onEntryChangedSuhuRuang2(Event event) {
+    setState(() {
+      suhuRuang2 = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+  _onEntryChangedGasRuang2(Event event) {
+    setState(() {
+      gasRuang2= DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+  _onEntryChangedApiRuang3(Event event) {
+    setState(() {
+      apiRuang3 = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+  _onEntryChangedSuhuRuang3(Event event) {
+    setState(() {
+      suhuRuang3 = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
 
@@ -55,6 +115,12 @@ class _HomePageState extends State<HomePage> {
       String title, String temperature, String fire, Color mainColor) {
     final deviceWidth = MediaQuery.of(context).size.width;
     final fontStyle = TextStyle(color: Colors.white);
+    if (temperature != null) {
+      temperature = temperature.substring(0,1);
+    } else {
+      temperature = '';
+    }
+    fire = fire == "Api terdeteksi" ? "Ada" : "Tidak ada";
     return Container(
       margin: EdgeInsets.only(
         left: deviceWidth * 0.025,
@@ -92,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                     style: fontStyle,
                   ),
                   Text(
-                    temperature,
+                    temperature + '°C',
                     style: TextStyle(color: Colors.white, fontSize: 25),
                   )
                 ],
@@ -349,9 +415,9 @@ class _HomePageState extends State<HomePage> {
         SizedBox(
           height: deviceHeight * 0.06,
         ),
-        _buildRoomCard('Ruangan 1', '37', '2', Color(0xfff67280)),
-        _buildRoomCard('Ruangan 2', '27', '0', Color(0xffc06c84)),
-        _buildRoomCard('Ruangan 3', '35', '3', Color(0xff6c567b)),
+        _buildRoomCard('Ruangan 1', suhuRuang1, apiRuang1, Color(0xfff67280)),
+        _buildRoomCard('Ruangan 2', suhuRuang2, apiRuang2, Color(0xffc06c84)),
+        _buildRoomCard('Ruangan 3', suhuRuang3, apiRuang3, Color(0xff6c567b)),
         _buildActuator(),
         _buildRoomMap(),
         SizedBox(
