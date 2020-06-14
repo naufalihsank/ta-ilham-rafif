@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                           style: fontStyle,
                         ),
                         Text(
-                          '5',
+                          gasRuang2,
                           style: TextStyle(color: Colors.white, fontSize: 25),
                         )
                       ],
