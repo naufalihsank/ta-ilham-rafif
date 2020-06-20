@@ -1,8 +1,11 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ta_ilham_rafif/model/dataResource.dart';
 import 'package:ta_ilham_rafif/widgets/side_drawer.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import '../FirebaseMessaging/firebaseMessaging.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,10 +16,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool pompaAir = false;
-  bool kipasPembuangan = false;
-  bool daruratDepan = false;
-  bool daruratBelakang = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   dynamic apiRuang1;
   dynamic suhuRuang1;
   dynamic apiRuang2;
@@ -24,6 +25,11 @@ class _HomePageState extends State<HomePage> {
   dynamic gasRuang2;
   dynamic apiRuang3;
   dynamic suhuRuang3;
+  dynamic pompaAir;
+  dynamic kipasPembuangan;
+  dynamic daruratDepan;
+  dynamic daruratBelakang;
+  dynamic ruangKebakaran;
 
   FirebaseApp app;
   DatabaseReference itemRefApiRuang1;
@@ -35,6 +41,9 @@ class _HomePageState extends State<HomePage> {
   DatabaseReference itemRefSuhuRuang3;
   DatabaseReference itemRefPintuDaruratDepan;
   DatabaseReference itemRefPintuDaruratBelakang;
+  DatabaseReference itemRefPompaAir;
+  DatabaseReference itemRefKipasPembuangan;
+  DatabaseReference itemRefRuangKebakaran;
 
   @override
   void initState() {
@@ -73,6 +82,30 @@ class _HomePageState extends State<HomePage> {
     itemRefSuhuRuang3 = database.reference().child('Ruangan3/Suhu');
     itemRefSuhuRuang3.onChildAdded.listen(_onEntryChangedSuhuRuang3);
     itemRefSuhuRuang3.onChildChanged.listen(_onEntryChangedSuhuRuang3);
+    itemRefPintuDaruratBelakang =
+        database.reference().child('Pintu daruat/2PintuBelakang');
+    itemRefPintuDaruratBelakang.onChildAdded
+        .listen(_onEntryChangedPintuDaruratBelakang);
+    itemRefPintuDaruratBelakang.onChildChanged
+        .listen(_onEntryChangedPintuDaruratBelakang);
+    itemRefPintuDaruratDepan =
+        database.reference().child('Pintu daruat/1PintuDepan');
+    itemRefPintuDaruratDepan.onChildAdded
+        .listen(_onEntryChangedPintuDaruratDepan);
+    itemRefPintuDaruratDepan.onChildChanged
+        .listen(_onEntryChangedPintuDaruratDepan);
+    itemRefPompaAir = database.reference().child('Sistem pemadam Api/1Pompa');
+    itemRefPompaAir.onChildAdded.listen(_onEntryChangedPompaAir);
+    itemRefPompaAir.onChildChanged.listen(_onEntryChangedPompaAir);
+    itemRefKipasPembuangan =
+        database.reference().child('SistemKebocoranGas/2Exhaust');
+    itemRefKipasPembuangan.onChildAdded.listen(_onEntryChangedKipasPembuangan);
+    itemRefKipasPembuangan.onChildChanged
+        .listen(_onEntryChangedKipasPembuangan);
+    itemRefRuangKebakaran =
+        database.reference().child('Sistem pemadam Api/3LokasiKebakaran');
+    itemRefRuangKebakaran.onChildAdded.listen(_onEntryChangedRuangKebakaran);
+    itemRefRuangKebakaran.onChildChanged.listen(_onEntryChangedRuangKebakaran);
   }
 
   _onEntryChangedApiRuang1(Event event) {
@@ -80,34 +113,70 @@ class _HomePageState extends State<HomePage> {
       apiRuang1 = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
+
   _onEntryChangedSuhuRuang1(Event event) {
     setState(() {
       suhuRuang1 = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
+
   _onEntryChangedApiRuang2(Event event) {
     setState(() {
       apiRuang2 = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
+
   _onEntryChangedSuhuRuang2(Event event) {
     setState(() {
       suhuRuang2 = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
+
   _onEntryChangedGasRuang2(Event event) {
     setState(() {
-      gasRuang2= DataResource.fromSnapShot(event.snapshot).value;
+      gasRuang2 = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
+
   _onEntryChangedApiRuang3(Event event) {
     setState(() {
       apiRuang3 = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
+
   _onEntryChangedSuhuRuang3(Event event) {
     setState(() {
       suhuRuang3 = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+
+  _onEntryChangedPintuDaruratBelakang(Event event) {
+    setState(() {
+      daruratBelakang = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+
+  _onEntryChangedPintuDaruratDepan(Event event) {
+    setState(() {
+      daruratDepan = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+
+  _onEntryChangedPompaAir(Event event) {
+    setState(() {
+      pompaAir = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+
+  _onEntryChangedKipasPembuangan(Event event) {
+    setState(() {
+      kipasPembuangan = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+
+  _onEntryChangedRuangKebakaran(Event event) {
+    setState(() {
+      ruangKebakaran = DataResource.fromSnapShot(event.snapshot).value;
     });
   }
 
@@ -116,7 +185,7 @@ class _HomePageState extends State<HomePage> {
     final deviceWidth = MediaQuery.of(context).size.width;
     final fontStyle = TextStyle(color: Colors.white);
     if (temperature != null) {
-      temperature = temperature.substring(0,1);
+      temperature = temperature.substring(0, 1);
     } else {
       temperature = '';
     }
@@ -171,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                           style: fontStyle,
                         ),
                         Text(
-                          gasRuang2,
+                          gasRuang2 != null ? gasRuang2 : '',
                           style: TextStyle(color: Colors.white, fontSize: 25),
                         )
                       ],
@@ -196,16 +265,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActuator() {
+  Widget _buildChildActuator(String title, String status) {
     final deviceWidth = MediaQuery.of(context).size.width;
+    final fontStyle = TextStyle(color: Colors.white, fontSize: 12);
 
     return Container(
-      margin: EdgeInsets.only(
-        left: deviceWidth * 0.025,
-        right: deviceWidth * 0.025,
-        top: deviceWidth * 0.025,
-      ),
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      width: 0.46 * deviceWidth,
+      height: 0.3 * deviceWidth,
       decoration: BoxDecoration(
         color: Color(0xffd35656),
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -219,83 +286,55 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: <Widget>[
           Text(
-            'Actuator',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-            ),
+            title,
+            style: fontStyle,
           ),
           Divider(
             color: Colors.white,
           ),
+          SizedBox(
+            height: deviceWidth * 0.05,
+          ),
+          Text(
+            status != null ? status : '',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActuator() {
+    final deviceWidth = MediaQuery.of(context).size.width;
+
+    return Container(
+      margin: EdgeInsets.only(
+        left: deviceWidth * 0.025,
+        right: deviceWidth * 0.025,
+        top: deviceWidth * 0.025,
+      ),
+      child: Column(
+        children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(
-                'Pompa Air',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              Switch(
-                value: pompaAir,
-                onChanged: (bool value) {
-                  setState(() {
-                    pompaAir = value;
-                  });
-                },
-              )
+              _buildChildActuator('Pompa Air', pompaAir),
+              _buildChildActuator('Kipas Pembuangan', kipasPembuangan)
             ],
+          ),
+          SizedBox(
+            height: deviceWidth * 0.025,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(
-                'Kipas Pembuangan',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              Switch(
-                value: kipasPembuangan,
-                onChanged: (bool value) {
-                  setState(() {
-                    kipasPembuangan = value;
-                  });
-                },
-              )
+              _buildChildActuator('Pintu Darurat Depan', daruratDepan),
+              _buildChildActuator('Pintu Darurat Belakang', daruratBelakang),
             ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                'Pintu Darurat Depan',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              Switch(
-                value: daruratDepan,
-                onChanged: (bool value) {
-                  setState(() {
-                    daruratDepan = value;
-                  });
-                },
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                'Pintu Darurat Belakang',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              Switch(
-                value: daruratBelakang,
-                onChanged: (bool value) {
-                  setState(() {
-                    daruratBelakang = value;
-                  });
-                },
-              )
-            ],
-          ),
+          )
         ],
       ),
     );
@@ -335,7 +374,9 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: ruangKebakaran == 'Ruangan 1'
+                      ? Color(0xffd35656)
+                      : Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(8.0)),
                 ),
                 width: deviceWidth * 0.4,
@@ -344,15 +385,18 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     '1',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 28
-                    ),
+                        color: ruangKebakaran == 'Ruangan 1'
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 28),
                   ),
                 ),
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: Color(0xffd35656),
+                  color: ruangKebakaran == 'Ruangan 2'
+                      ? Color(0xffd35656)
+                      : Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(8.0)),
                 ),
                 width: deviceWidth * 0.4,
@@ -361,9 +405,10 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     '2',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28
-                    ),
+                        color: ruangKebakaran == 'Ruangan 2'
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 28),
                   ),
                 ),
               )
@@ -377,7 +422,9 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: ruangKebakaran == 'Ruangan 3'
+                      ? Color(0xffd35656)
+                      : Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(8.0)),
                 ),
                 width: deviceWidth * 0.4,
@@ -386,9 +433,10 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     '3',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 28
-                    ),
+                        color: ruangKebakaran == 'Ruangan 3'
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 28),
                   ),
                 ),
               ),
@@ -461,8 +509,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> _scaffoldKey =
-        new GlobalKey<ScaffoldState>();
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -476,7 +522,8 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white,
             ),
             _pageContent(),
-            _buildHeader(_scaffoldKey)
+            _buildHeader(_scaffoldKey),
+            FirebaseMessagingInstance()
           ],
         ));
   }
