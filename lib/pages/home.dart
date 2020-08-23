@@ -51,10 +51,16 @@ class _HomePageState extends State<HomePage> {
   DatabaseReference itemRefRuangKebakaran;
   DatabaseReference itemRefSwitch;
 
+  final textController = TextEditingController();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   @override
   void initState() {
     super.initState();
     getFirebase();
+    _firebaseMessaging.getToken().then((deviceToken) {
+      textController.text = deviceToken;
+    });
   }
 
   void getFirebase() async {
@@ -536,6 +542,49 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildTempToken() {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final fontStyle = TextStyle(color: Colors.white, fontSize: 12);
+
+    return Container(
+      margin: EdgeInsets.only(
+        left: deviceWidth * 0.025,
+        right: deviceWidth * 0.025,
+        top: deviceWidth * 0.025,
+      ),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      width: 0.46 * deviceWidth,
+      height: 0.4 * deviceWidth,
+      decoration: BoxDecoration(
+        color: Color(0xffd35656),
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(2.0, 2.0),
+            blurRadius: 5.0,
+          )
+        ],
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Token',
+            style: fontStyle,
+          ),
+          Divider(
+            color: Colors.white,
+          ),
+          SizedBox(
+            height: deviceWidth * 0.05,
+          ),
+          TextField(
+            controller: textController,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _pageContent() {
     final deviceHeight = MediaQuery.of(context).size.height;
     return ListView(
@@ -550,6 +599,7 @@ class _HomePageState extends State<HomePage> {
         _buildActuator(),
         _buildRoomMap(),
         _buildSwitch(),
+        _buildTempToken(),
         SizedBox(
           height: deviceHeight * 0.05,
         )
