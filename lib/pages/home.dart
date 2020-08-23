@@ -4,6 +4,9 @@ import 'package:ta_ilham_rafif/model/dataResource.dart';
 import 'package:ta_ilham_rafif/widgets/side_drawer.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 import '../FirebaseMessaging/firebaseMessaging.dart';
 
@@ -30,6 +33,8 @@ class _HomePageState extends State<HomePage> {
   dynamic daruratDepan;
   dynamic daruratBelakang;
   dynamic ruangKebakaran;
+  dynamic switchString;
+  bool switchBool;
 
   FirebaseApp app;
   DatabaseReference itemRefApiRuang1;
@@ -44,6 +49,7 @@ class _HomePageState extends State<HomePage> {
   DatabaseReference itemRefPompaAir;
   DatabaseReference itemRefKipasPembuangan;
   DatabaseReference itemRefRuangKebakaran;
+  DatabaseReference itemRefSwitch;
 
   @override
   void initState() {
@@ -106,6 +112,9 @@ class _HomePageState extends State<HomePage> {
         database.reference().child('Sistem pemadam Api/3LokasiKebakaran');
     itemRefRuangKebakaran.onChildAdded.listen(_onEntryChangedRuangKebakaran);
     itemRefRuangKebakaran.onChildChanged.listen(_onEntryChangedRuangKebakaran);
+    itemRefSwitch = database.reference().child('Switch');
+    itemRefSwitch.onChildAdded.listen(_onEntryChangedSwitch);
+    itemRefSwitch.onChildChanged.listen(_onEntryChangedSwitch);
   }
 
   _onEntryChangedApiRuang1(Event event) {
@@ -177,6 +186,13 @@ class _HomePageState extends State<HomePage> {
   _onEntryChangedRuangKebakaran(Event event) {
     setState(() {
       ruangKebakaran = DataResource.fromSnapShot(event.snapshot).value;
+    });
+  }
+
+  _onEntryChangedSwitch(Event event) {
+    setState(() {
+      switchString = DataResource.fromSnapShot(event.snapshot).value;
+      switchBool = switchString == "ON";
     });
   }
 
@@ -455,6 +471,71 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildSwitch() {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final fontStyle = TextStyle(color: Colors.white, fontSize: 12);
+
+    Future<bool> postSwitch(value) async {
+      String valueString = value ? "ON" : "OFF";
+      Map<String, String> gateData = {
+        "value": valueString,
+      };
+      final http.Response response = await http.put(
+        //await sama kayak .then()
+        'https://tarafifm.firebaseio.com/Switch.json', // auth=${_authenticatedUser.token} untuk mengikutsertakan token dari user saat fetching data
+        body: json.encode(gateData),
+      );
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      return true;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(
+        left: deviceWidth * 0.025,
+        right: deviceWidth * 0.025,
+        top: deviceWidth * 0.025,
+      ),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      width: 0.46 * deviceWidth,
+      height: 0.4 * deviceWidth,
+      decoration: BoxDecoration(
+        color: Color(0xffd35656),
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        boxShadow: [
+          BoxShadow(
+            offset: Offset(2.0, 2.0),
+            blurRadius: 5.0,
+          )
+        ],
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Switch',
+            style: fontStyle,
+          ),
+          Divider(
+            color: Colors.white,
+          ),
+          SizedBox(
+            height: deviceWidth * 0.05,
+          ),
+          Container(
+            child: Switch(
+              value: switchBool,
+              onChanged: (value) {
+                setState(() {
+                  switchBool = value;
+                  postSwitch(value);
+                });
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _pageContent() {
     final deviceHeight = MediaQuery.of(context).size.height;
     return ListView(
@@ -468,6 +549,7 @@ class _HomePageState extends State<HomePage> {
         _buildRoomCard('Ruangan 3', suhuRuang3, apiRuang3, Color(0xff6c567b)),
         _buildActuator(),
         _buildRoomMap(),
+        _buildSwitch(),
         SizedBox(
           height: deviceHeight * 0.05,
         )
